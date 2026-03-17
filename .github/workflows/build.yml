@@ -1,18 +1,30 @@
-name: iOS Template Compiler
+name: IOS 3NGINE Master Compiler
 on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build IPA
+      
+      - name: Compile and Bundle IPA
         run: |
+          # 1. Compile the Xcode project into an Apple binary
           xcodebuild archive -project iOS-Test.xcodeproj -scheme iOS-Test -configuration Release -archivePath build/App.xcarchive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+          
+          # 2. Create the Payload folder (This is required for ESign/Scarlet to read it)
           mkdir -p Payload
+          
+          # 3. Move the compiled app into the Payload folder
           cp -r build/App.xcarchive/Products/Applications/*.app Payload/
-          zip -r Final_Regedit_Template.ipa Payload
-      - name: Upload
+          
+          # 4. THE PAYLOAD INJECTOR: This physically copies your 4 OG text files into the App Sandbox
+          cp *.txt Payload/*.app/ 2>/dev/null || true
+          
+          # 5. Zip the whole package into your final installable IPA
+          zip -r IOS_3NGINE_Final.ipa Payload
+          
+      - name: Upload Final Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Template-IPA
-          path: Final_Regedit_Template.ipa
+          name: IOS-3NGINE-IPA
+          path: IOS_3NGINE_Final.ipa
