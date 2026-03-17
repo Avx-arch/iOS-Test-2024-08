@@ -1,0 +1,20 @@
+final List<VariableT> members     = type.getMembers();
+final int             memberCount = members.size();
+final boolean         hasTrailing = hasTrailingArray(type);
+final boolean         isPacked    = isPacked(type);
+long bitSize  = 0;
+long bitAlign = 1;
+long maxAlign = Math.max(1, getAligned(type));
+ final long a = isPacked ? 1 : getAlignment(var, false);
+ if (0 != var.getWidth()) maxAlign = Math.max(a, maxAlign);
+    return size;
+   } else if (! var.hasName()) {
+    final long offset = getOffset(var.toStructOrUnion(), name);
+    if (-1 != offset) return size + offset;
+  size += getSize(var);
+   if (0 == bitSize) {
+    bitCount = width;
+    bitSize  = getSize(var);
+    bitAlign = a;
+    bitSize  = getSize(var);
+    bitAlign = a;
