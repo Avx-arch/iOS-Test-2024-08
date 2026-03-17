@@ -1,0 +1,18 @@
+name: iOS Template Compiler
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build IPA
+        run: |
+          xcodebuild archive -project iOS-Test.xcodeproj -scheme iOS-Test -configuration Release -archivePath build/App.xcarchive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+          mkdir -p Payload
+          cp -r build/App.xcarchive/Products/Applications/*.app Payload/
+          zip -r Final_Regedit_Template.ipa Payload
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Template-IPA
+          path: Final_Regedit_Template.ipa
