@@ -1,25 +1,27 @@
-name: IOS 3NGINE Master Compiler
-on: [push, workflow_dispatch]
+name: iOS IPA Free Compilation
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
 jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Compile and Bundle IPA
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Build iOS App (Unsigned)
         run: |
-          xcodebuild archive -project iOS-Test.xcodeproj -scheme iOS-Test -configuration Release -archivePath build/App.xcarchive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+          xcodebuild -project RegeditDashboard.xcodeproj -scheme RegeditDashboard -sdk iphoneos -configuration Release clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
           
+      - name: Package into IPA
+        run: |
           mkdir -p Payload
-          cp -r build/App.xcarchive/Products/Applications/*.app Payload/
+          mv build/Release-iphoneos/RegeditDashboard.app Payload/
+          zip -r RegeditDashboard.ipa Payload
           
-          # This specifically injects the raw text payloads into the App Sandbox
-          cp *.txt Payload/*.app/ 2>/dev/null || true
-          
-          zip -r IOS_3NGINE_Final.ipa Payload
-          
-      - name: Upload Final Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: IOS-3NGINE-IPA
-          path: IOS_3NGINE_Final.ipa
+          name: RegeditDashboard-IPA
+          path: RegeditDashboard.ipa
